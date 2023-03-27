@@ -119,7 +119,7 @@ class Scanner(BaseScanner):
         print(dataset)
         parsed_dataset = json.loads(dataset)
         # establish a connection to the SQLite database
-        conn = sqlite3.connect('/home/semidark/src/victron-ble/solar.db')
+        conn = sqlite3.connect('solar.db')
         # create a cursor object to execute SQL statements
         cursor = conn.cursor()
 
