@@ -4,6 +4,9 @@ import inspect
 import json
 import logging
 import time
+import sqlite3
+import datetime
+
 from enum import Enum
 from typing import Set
 
@@ -112,7 +115,47 @@ class Scanner(BaseScanner):
             "rssi": ble_device.rssi,
             "payload": parsed,
         }
-        print(json.dumps(blob, cls=DeviceDataEncoder, indent=2))
+        dataset = json.dumps(blob, cls=DeviceDataEncoder, indent=2) 
+        print(dataset)
+        parsed_dataset = json.loads(dataset)
+        # establish a connection to the SQLite database
+        conn = sqlite3.connect('/home/semidark/src/victron-ble/solar.db')
+        # create a cursor object to execute SQL statements
+        cursor = conn.cursor()
+
+        # Create table if not exists
+        cursor.execute('''CREATE TABLE IF NOT EXISTS solar_data 
+                ("date"	TIME, battery_charging_current REAL, 
+                battery_voltage REAL, charge_state TEXT,  
+                solar_power INTEGER, yield_today INTEGER)''')
+
+
+        query='''INSERT INTO solar_data 
+            (date, battery_charging_current, battery_voltage, 
+            charge_state, solar_power, yield_today) 
+            VALUES ('{}', {}, {}, '{}', {}, {})'''
+        now=datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        values=(
+            now,
+            parsed_dataset['payload']['battery_charging_current'],
+            parsed_dataset['payload']['battery_voltage'], 
+            parsed_dataset['payload']['charge_state'],
+            parsed_dataset['payload']['solar_power'], 
+            parsed_dataset['payload']['yield_today']
+        )
+
+        query_with_values = query.format(*values)
+
+        #print(query_with_values)
+
+        # insert the data into the table
+        cursor.execute(query_with_values)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        #with open("dump.json","w") as json_file:json.dump(parsed_dataset,json_file)
+        import sys
+        sys.exit(0)
 
 
 class DiscoveryScanner(BaseScanner):

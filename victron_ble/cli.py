@@ -27,7 +27,7 @@ class DeviceKeyParam(click.ParamType):
 @click.group()
 @click.option("-v", "--verbose", is_flag=True, help="Increase logging output")
 def cli(verbose):
-    logger.setLevel(logging.DEBUG if verbose else logging.INFO)
+    logger.setLevel(logging.DEBUG if verbose else logging.ERROR)
 
 
 @cli.command(help="Discover Victron devices with Instant Readout")
