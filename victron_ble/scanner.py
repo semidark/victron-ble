@@ -134,7 +134,7 @@ class Scanner(BaseScanner):
             (date, battery_charging_current, battery_voltage, 
             charge_state, solar_power, yield_today) 
             VALUES ('{}', {}, {}, '{}', {}, {})'''
-        now=datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        now=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         values=(
             now,
             parsed_dataset['payload']['battery_charging_current'],
